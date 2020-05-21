@@ -18,6 +18,7 @@ static U8 lcd_copy[NXT_LCD_DEPTH * NXT_LCD_WIDTH];
 
 EXTERNAL_BMP_DATA(Image_0);
 EXTERNAL_BMP_DATA(Image_1);
+EXTERNAL_BMP_DATA(Image_2);
 
 void ecrobot_device_initialize(void)
 {
@@ -61,6 +62,14 @@ TASK(TASK_MAIN)
 		goto label_a5eb58fe09c443a4b34046036b198665;
 	}
 	
+	label_a5eb58fe09c443a4b34046036b198665:
+	x = ecrobot_get_nxtcolorsensor_id(NXT_PORT_S1);
+	label_dbadeaa0947b9b7f17fee35fee7d9:
+	if (x > 0) {
+		goto label_dbe540d1de634215ac96302076a19ced;
+	} else {
+		goto label_b16867c67f0c46c58e8f413f738517c8;
+	}
 	label_b3826fdd116f4974bb20e029d67ba2ac:
 	while (ecrobot_get_nxtcolorsensor_id(NXT_PORT_S1) != NXT_COLOR_GREEN) {
 		wait(4);
@@ -109,15 +118,6 @@ TASK(TASK_MAIN)
 	display_bitmap_copy(lcd, 100, 8, 0, 0);
 	display_update();
 	goto label_b79a3574009472fa7e95b1eb13faf32;
-	label_a5eb58fe09c443a4b34046036b198665:
-	x = ecrobot_get_nxtcolorsensor_id(NXT_PORT_S1);
-	goto label_dbadeaa0947b9b7f17fee35fee7d9;
-	label_dbadeaa0947b9b7f17fee35fee7d9:
-	if (x > 0) {
-		goto label_dbe540d1de634215ac96302076a19ced;
-	} else {
-		goto label_b16867c67f0c46c58e8f413f738517c8;
-	}
 	label_dbe540d1de634215ac96302076a19ced:
 	while (ecrobot_get_nxtcolorsensor_id(NXT_PORT_S1) != NXT_COLOR_BLACK) {
 		wait(4);
@@ -143,7 +143,22 @@ TASK(TASK_MAIN)
 	label_f829320ea8ba49ada2c380990c993451:
 	wait(4000);
 	
-	goto label_a2502f59bdb54a749e8d8d8a7af43265;
+	label_a2502f59bdb54a749e8d8d8a7af43265:
+	
+	label_b61346d886d2e1c094feb962:
+	for (int _counter = 0; _counter < sizeof(lcd); ++_counter) {
+		lcd_copy[_counter] = lcd[_counter];
+	}
+	ecrobot_bmp2lcd(BMP_DATA_START(Image_2), lcd, 100, 64);
+	for (int _counter = 0; _counter < sizeof(lcd); ++_counter) {
+		lcd[_counter] |= lcd_copy[_counter];
+	}
+	display_bitmap_copy(lcd, 100, 8, 0, 0);
+	display_update();
+	label_f75f9654cc93460fa99bbd119a26cd4b:
+	wait(100);
+	
+	goto label_ee51ec91734f7ea6816aaa1f74e589;
 	label_b16867c67f0c46c58e8f413f738517c8:
 	ecrobot_sound_tone(1000, 100, 50);
 	
@@ -154,7 +169,5 @@ TASK(TASK_MAIN)
 	label_ccbc85c177f43ef9d0c205fd51eac37:
 	nxt_motor_set_count(NXT_PORT_B, 0);
 	
-	label_a2502f59bdb54a749e8d8d8a7af43265:
-	
-	goto label_ee51ec91734f7ea6816aaa1f74e589;
+	goto label_a2502f59bdb54a749e8d8d8a7af43265;
 }
